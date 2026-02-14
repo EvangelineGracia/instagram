@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Insta-like Page</title>
+    <style>
+        :root{
+            --bg:#fafafa;
+            --card:#fff;
+            --muted:#8e8e8e;
+            --border:#dbdbdb;
+            --accent:#0095f6;
+            --max-width:935px;
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+            margin:0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background:var(--bg);
+            color:#262626;
+            display:flex;
+            justify-content:center;
+            padding:28px 16px;
+        }
+
+        /* Layout */
+        .shell{
+            width:100%;
+            max-width:var(--max-width);
+            display:grid;
+            grid-template-columns: minmax(0,618px) 293px;
+            gap:28px;
+        }
+        @media (max-width:1000px){
+            .shell{grid-template-columns:1fr}
+            .sidebar{display:none}
+        }
+
+        /* Top nav (sticky look) */
+        header{
+            position:sticky;
+            top:0;
+            background:linear-gradient(#fff, #fff);
+            z-index:10;
+            padding:12px 0;
+            margin-bottom:12px;
+        }
+        .nav{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            max-width:var(--max-width);
+            width:100%;
+        }
+        .logo{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            font-weight:600;
+            font-size:22px;
+        }
+        .logo-mark{
+            width:36px;height:36px;border-radius:8px;background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);
+            display:inline-block;
+        }
+        .search{
+            flex:1;
+            max-width:270px;
+            margin:0 18px;
+        }
+        .search input{
+            width:100%;
+            padding:8px 12px;
+            border-radius:8px;
+            border:1px solid var(--border);
+            font-size:14px;
+            background:#fff;
+        }
+        .nav-actions{display:flex;gap:14px;align-items:center}
+        .icon-btn{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px;cursor:pointer}
+        .icon-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6}
+        .icon-btn:hover{background:#f2f2f2}
+
+        /* Stories */
+        .stories{
+            display:flex;
+            gap:12px;
+            padding:12px;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:8px;
+            overflow:auto;
+        }
+        .story{
+            flex:0 0 auto;
+            width:78px;
+            text-align:center;
+            font-size:12px;
+        }
+        .story .ring{
+            width:66px;height:66px;border-radius:50%;padding:3px;background:conic-gradient(#f58529,#dd2a7b,#8134af,#515bd4);display:inline-block;
+        }
+        .story img{
+            width:100%;height:100%;border-radius:50%;display:block;background:#ddd;object-fit:cover;
+            border:3px solid white;
+            box-sizing:content-box;
+        }
+        .story span{display:block;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+        /* Post card */
+        .card{
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:8px;
+            margin-bottom:18px;
+            overflow:hidden;
+            box-shadow:0 1px 0 rgba(0,0,0,0.02);
+        }
+        .post-header{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:12px;
+        }
+        .avatar{width:42px;height:42px;border-radius:50%;background:#ddd;flex:0 0 auto;overflow:hidden}
+        .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+        .user{
+            flex:1;
+            min-width:0;
+        }
+        .user .name{font-weight:600;font-size:14px}
+        .user .meta{font-size:12px;color:var(--muted)}
+        .more{color:var(--muted)}
+
+        .post-image{width:100%;height:520px;background:#eee;object-fit:cover;display:block}
+
+        .post-actions{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:10px 12px;
+        }
+        .actions-left{display:flex;gap:10px}
+        .like-btn{cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+        .like-btn svg{width:24px;height:24px}
+        .likes{padding:0 12px 10px 12px;font-weight:600}
+
+        .caption{padding:0 12px 12px 12px;font-size:14px}
+        .caption .who{font-weight:600;margin-right:6px}
+
+        .comments{padding:0 12px 12px 12px;color:var(--muted);font-size:13px}
+        .time{padding:0 12px 12px 12px;font-size:12px;color:var(--muted);text-transform:uppercase}
+
+        .add-comment{
+            border-top:1px solid var(--border);
+            padding:8px 12px;
+            display:flex;
+            gap:10px;
+            align-items:center;
+            background:var(--card);
+        }
+        .add-comment input{
+            border:0;outline:0;flex:1;padding:8px 6px;font-size:14px;background:transparent;
+        }
+        .post-action-btn{color:var(--accent);font-weight:600;border:0;background:none;cursor:pointer;padding:6px 8px;border-radius:6px}
+        .post-action-btn:disabled{opacity:0.4;cursor:default}
+
+        /* Sidebar */
+        .sidebar{position:sticky;top:28px}
+        .profile{
+            display:flex;align-items:center;gap:12px;background:transparent;margin-bottom:12px;
+        }
+        .profile .meta{font-size:13px}
+        .suggestions{
+            background:var(--card);
+            padding:12px;border:1px solid var(--border);border-radius:8px;
+        }
+        .suggestions h4{margin:0 0 12px 0;font-size:14px;color:var(--muted)}
+        .suggestion{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+        .suggestion .left{display:flex;gap:10px;align-items:center}
+        .suggestion img{width:42px;height:42px;border-radius:50%;background:#ddd;object-fit:cover}
+        .suggestion .who{font-size:13px}
+        .switch{color:var(--accent);font-weight:600;cursor:pointer}
+
+        /* scrollbar small */
+        .stories::-webkit-scrollbar{height:8px}
+        .stories::-webkit-scrollbar-thumb{background:#eee;border-radius:8px}
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="nav" role="navigation" aria-label="top">
+            <div class="logo"><span class="logo-mark" aria-hidden="true"></span><span>InstaClone</span></div>
+            <div class="search" aria-hidden="false"><input placeholder="Search" /></div>
+            <div class="nav-actions" aria-hidden="false">
+                <div class="icon-btn" title="Home" aria-label="Home">
+                    <svg viewBox="0 0 24 24"><path d="M3 9.5L12 4l9 5.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+                </div>
+                <div class="icon-btn" title="Messages">
+                    <svg viewBox="0 0 24 24"><path d="M21 2H3v14h6l3 3 3-3h6z"/></svg>
+                </div>
+                <div class="icon-btn" title="New">
+                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div class="icon-btn" title="Activity">
+                    <svg viewBox="0 0 24 24"><path d="M12 21s-6-4.35-9-7.5C1.5 10.5 3 6 7.5 6c2 0 3 1.5 4.5 3 1.5-1.5 2.5-3 4.5-3C21 6 22.5 10.5 21 13.5 18 16.65 12 21 12 21z"/></svg>
+                </div>
+                <div class="icon-btn" title="Profile">
+                    <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20a8 8 0 1 1 16 0"/></svg>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="shell">
+        <section>
+            <div class="stories" aria-label="Stories">
+                <div class="story">
+                    <div class="ring"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=60" alt="story avatar"></div>
+                    <span>Your story</span>
+                </div>
+                <div class="story">
+                    <div class="ring"><img src="https://images.unsplash.com/photo-1545996124-1b69d7f5a9d4?w=200&q=60" alt=""></div>
+                    <span>alice</span>
+                </div>
+                <div class="story">
+                    <div class="ring"><img src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=200&q=60" alt=""></div>
+                    <span>charles</span>
+                </div>
+                <div class="story">
+                    <div class="ring"><img src="https://images.unsplash.com/photo-1531123414780-f3bfa1f1b8b0?w=200&q=60" alt=""></div>
+                    <span>hannah</span>
+                </div>
+                <div class="story">
+                    <div class="ring"><img src="https://images.unsplash.com/photo-1541534401786-14037cdcc538?w=200&q=60" alt=""></div>
+                    <span>maria</span>
+                </div>
+            </div>
+
+            <!-- Post 1 -->
+            <article class="card" data-id="1">
+                <div class="post-header">
+                    <div class="avatar"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&q=60" alt="user avatar"></div>
+                    <div class="user">
+                        <div class="name">jordan</div>
+                        <div class="meta">New York, NY</div>
+                    </div>
+                    <div class="more">•••</div>
+                </div>
+
+                <img class="post-image" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80" alt="post image">
+
+                <div class="post-actions">
+                    <div class="actions-left">
+                        <button class="icon-btn like-btn" aria-pressed="false" title="Like">
+                            <svg viewBox="0 0 24 24" class="heart">
+                                <path d="M12 21s-7-4.35-10-7.5C1.5 10.5 3 6 7.5 6c2 0 3 1.5 4.5 3 1.5-1.5 2.5-3 4.5-3C21 6 22.5 10.5 21 13.5 18 16.65 12 21 12 21z"/>
+                            </svg>
+                        </button>
+                        <div class="icon-btn" title="Comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                        <div class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14"/><path d="M16 6l-4-4-4 4"/></svg></div>
+                    </div>
+                    <div class="icon-btn" title="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+                </div>
+
+                <div class="likes">1,204 likes</div>
+
+                <div class="caption"><span class="who">jordan</span>Morning light and good coffee. New print in my shop — check link in bio.</div>
+
+                <div class="comments">View all 18 comments</div>
+
+                <div class="time">2 HOURS AGO</div>
+
+                <form class="add-comment" onsubmit="event.preventDefault();">
+                    <input placeholder="Add a comment..." aria-label="Add a comment"/>
+                    <button class="post-action-btn" disabled>Post</button>
+                </form>
+            </article>
+
+            <!-- Post 2 -->
+            <article class="card" data-id="2">
+                <div class="post-header">
+                    <div class="avatar"><img src="https://images.unsplash.com/photo-1545996124-1b69d7f5a9d4?w=300&q=60" alt="user avatar"></div>
+                    <div class="user">
+                        <div class="name">studio.lab</div>
+                        <div class="meta">Los Angeles</div>
+                    </div>
+                    <div class="more">•••</div>
+                </div>
+
+                <img class="post-image" src="https://images.unsplash.com/photo-1506765515384-028b60a970df?w=1200&q=80" alt="post image">
+
+                <div class="post-actions">
+                    <div class="actions-left">
+                        <button class="icon-btn like-btn" aria-pressed="false" title="Like">
+                            <svg viewBox="0 0 24 24" class="heart">
+                                <path d="M12 21s-7-4.35-10-7.5C1.5 10.5 3 6 7.5 6c2 0 3 1.5 4.5 3 1.5-1.5 2.5-3 4.5-3C21 6 22.5 10.5 21 13.5 18 16.65 12 21 12 21z"/>
+                            </svg>
+                        </button>
+                        <div class="icon-btn" title="Comment"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                        <div class="icon-btn" title="Share"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14"/><path d="M16 6l-4-4-4 4"/></svg></div>
+                    </div>
+                    <div class="icon-btn" title="Save"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+                </div>
+
+                <div class="likes">8,901 likes</div>
+
+                <div class="caption"><span class="who">studio.lab</span>Design notes: contrast, negative space, and balance.</div>
+
+                <div class="comments">View 52 comments</div>
+
+                <div class="time">1 DAY AGO</div>
+
+                <form class="add-comment" onsubmit="event.preventDefault();">
+                    <input placeholder="Add a comment..." aria-label="Add a comment"/>
+                    <button class="post-action-btn" disabled>Post</button>
+                </form>
+            </article>
+        </section>
+
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="profile">
+                <div class="avatar" style="width:56px;height:56px"><img src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=300&q=60" alt="you"></div>
+                <div class="meta">
+                    <div style="font-weight:700">youremail</div>
+                    <div style="color:var(--muted)">Your Name</div>
+                </div>
+            </div>
+
+            <div class="suggestions">
+                <h4>Suggested for you</h4>
+                <div class="suggestion">
+                    <div class="left">
+                        <img src="https://images.unsplash.com/photo-1531123414780-f3bfa1f1b8b0?w=200&q=60" alt="">
+                        <div>
+                            <div class="who">urban.explorer</div>
+                            <div style="font-size:12px;color:var(--muted)">Suggested</div>
+                        </div>
+                    </div>
+                    <div class="switch">Follow</div>
+                </div>
+                <div class="suggestion">
+                    <div class="left">
+                        <img src="https://images.unsplash.com/photo-1541534401786-14037cdcc538?w=200&q=60" alt="">
+                        <div>
+                            <div class="who">foodie</div>
+                            <div style="font-size:12px;color:var(--muted)">Popular</div>
+                        </div>
+                    </div>
+                    <div class="switch">Follow</div>
+                </div>
+                <div class="suggestion">
+                    <div class="left">
+                        <img src="https://images.unsplash.com/photo-1545996124-1b69d7f5a9d4?w=200&q=60" alt="">
+                        <div>
+                            <div class="who">minimal</div>
+                            <div style="font-size:12px;color:var(--muted)">New</div>
+                        </div>
+                    </div>
+                    <div class="switch">Follow</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        // Basic interactive like toggle & enable comment button
+        document.querySelectorAll('.card').forEach(card=>{
+            const likeBtn = card.querySelector('.like-btn');
+            const heartPath = likeBtn.querySelector('.heart path');
+            const likesElem = card.querySelector('.likes');
+            let liked = false;
+
+            likeBtn.addEventListener('click', ()=> {
+                liked = !liked;
+                likeBtn.setAttribute('aria-pressed', liked);
+                if(liked){
+                    heartPath.setAttribute('fill','#ed4956');
+                    heartPath.setAttribute('stroke','none');
+                    // increment likes display (simple parse)
+                    const n = parseLikes(likesElem.textContent || '');
+                    likesElem.textContent = formatLikes(n + 1);
+                } else {
+                    heartPath.setAttribute('fill','none');
+                    heartPath.setAttribute('stroke','currentColor');
+                    const n = parseLikes(likesElem.textContent || '');
+                    likesElem.textContent = formatLikes(Math.max(0, n - 1));
+                }
+            });
+
+            const input = card.querySelector('.add-comment input');
+            const postBtn = card.querySelector('.add-comment .post-action-btn');
+            input.addEventListener('input',()=> postBtn.disabled = input.value.trim()==='');
+            postBtn.addEventListener('click',()=>{
+                if(input.value.trim()==='') return;
+                const comments = card.querySelector('.comments');
+                comments.textContent = 'View all comments';
+                input.value=''; postBtn.disabled=true;
+            });
+        });
+
+        function parseLikes(text){
+            // crude parse: "1,204 likes" => 1204 ; "8,901 likes" => 8901
+            const num = text.split(' ')[0] || '0';
+            return Number(num.replace(/,/g,'')) || 0;
+        }
+        function formatLikes(n){
+            if(n>=1000) return Math.round(n/1000*10)/10 + 'k likes';
+            return n.toLocaleString() + ' likes';
+        }
+    </script>
+</body>
+</html></svg></div></svg>
